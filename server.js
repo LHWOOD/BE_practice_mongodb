@@ -2,9 +2,9 @@ const express = require("express");
 const logger = require("morgan");
 const mongoose = require("mongoose");
 
-const PORT = process.env.PORT || 3000;
+const db = require("./config/connection");
 
-const db = require("./models");
+const PORT = process.env.PORT || 3000;
 
 const app = express();
 
@@ -15,13 +15,17 @@ app.use(express.json());
 
 app.use(express.static("public"));
 
-mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/practice", {
+mongoose.connect("mongodb://localhost/practice", {
   useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true,
   useFindAndModify: false,
+  useUnifiedTopology: true,
 });
 
-app.listen(PORT, () => {
-  console.log(`App running on port ${PORT}!`);
+// routes
+app.use(require("./controllers/user.js"));
+
+db.once("open", () => {
+  app.listen(PORT, () => {
+    console.log(`running on port ${PORT}!`);
+  });
 });
